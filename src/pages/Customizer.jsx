@@ -42,7 +42,7 @@ const Customizer = () => {
             prompt={prompt}
             setPrompt={setPrompt}
             generatingImg={generatingImg}
-            handleSumbit={handleSumbit}
+            handleSubmit={handleSubmit}
           />
         );
       default:
@@ -50,19 +50,46 @@ const Customizer = () => {
     }
   };
 
-  const handleSumbit = async (type) => {
+  const handleSubmit = async (type) => {
     if (!prompt) {
       return alert("Please enter a prompt");
     }
     try {
-      // call our backend to generate an ai image!
+      setGeneratingImg(true);
+  
+      // // Créer un form-data
+      // const formData = new FormData();
+      // formData.append("prompt", prompt);
+  
+      console.log("Prompt envoyé au backend :", prompt);
+      const response = await fetch("http://localhost:8080/api/v1/dalle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+  
+      const data = await response.json();
+      console.log("Réponse du serveur backend :", data);
+  
+      if (!data.photo) {
+        console.error("Erreur: L'image est undefined !");
+        return;
+      }
+  
+      const imageUrl = data.photo;
+      console.log("URL de l'image générée :", imageUrl);
+  
+      handleDecals(type, imageUrl);
     } catch (error) {
-      alert(error.message);
+      alert(error);
     } finally {
       setGeneratingImg(false);
       setActiveEditorTab("");
     }
   };
+  
 
   const handleDecals = (type, result) => {
     const decalType = DecalTypes[type];
@@ -85,6 +112,7 @@ const Customizer = () => {
       default:
         state.isLogoTexture = true;
         state.isFullTexture = false;
+        break;
     }
 
     // after setting the state, activeFilterTab is updated
