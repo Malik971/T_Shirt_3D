@@ -81,7 +81,7 @@ const Customizer = () => {
       const imageUrl = data.photo;
       console.log("URL de l'image générée :", imageUrl);
   
-      handleDecals(type, imageUrl);
+      handleDecals(type, `data:image/png;base64,${imageUrl}`);
     } catch (error) {
       alert(error);
     } finally {
